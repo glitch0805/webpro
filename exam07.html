@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이번학기 자신의 시간표 (셀병합 & CSS)</title>
+    <!-- 구글 웹 폰트 (Gugi) 불러오기 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gugi&display=swap" rel="stylesheet">
+    <style>
+        /* 폰트 적용 (제공된 코드의 t1 클래스 스타일 활용) */
+        body {
+            font-family: "Gugi", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        /* 테이블 기본 스타일 */
+        table {
+            width: 100%;
+            border-collapse: collapse; /* 테두리 중복 방지 */
+            margin: 10px auto;
+            background-color: white; /* 표 배경은 흰색 */
+        }
+
+        /* 제공된 div 스타일(border: 1px solid red;)을 테이블 테두리에 적용 */
+        table, th, td {
+            border: 1px solid red;
+        }
+
+        /* th(테이블 헤더) 스타일 */
+        th {
+            /* 제공된 div 스타일(background-color: aliceblue;) 활용 */
+            background-color: aliceblue; 
+            padding: 10px;
+            text-align: center;
+        }
+
+        /* td(테이블 셀) 스타일 */
+        td {
+            padding: 10px;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        /* 수업이 있는 칸(비어있지 않은 td)에 약간의 강조 배경색 적용 */
+        td:not(:empty) {
+            background-color: #fff9e6; /* 연한 노란색 계열 배경 */
+            font-weight: bold;
+        }
+        
+        /* 제공된 g1 클래스(display: inline-block)처럼 과목 정보를 감싸는 span 예시 스타일 */
+        .subject-info {
+            display: inline-block;
+            margin-top: 5px;
+            font-size: 0.85em;
+            color: #555;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+    <h1>장영운 학생 2026년 2학기 정규 시간표</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>교시/시간</th>
+                <th>일</th>
+                <th>월</th>
+                <th>화</th>
+                <th>수</th>
+                <th>목</th>
+                <th>금</th>
+                <th>토</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>1교시 [09:00~09:50]</th>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td rowspan="3">
+                    데이터베이스 설계<br>
+                    <span class="subject-info">바울관 303호(AIC프로젝트LAB실)/842<br>최민석</span>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th>2교시 [10:00~10:50]</th>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th>3교시 [11:00~11:50]</th>
+                <td></td>
+                <td>
+                    강당(메인)/806<br>
+                    <span class="subject-info">하항래</span>
+                </td>
+                <td></td>
+                <td rowspan="2">
+                    역사와문화<br>
+                    <span class="subject-info">다니엘관 304호(大)/864<br>하항래</span>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th>4교시 [12:00~12:50]</th>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th>5교시 [13:00~13:50]</th>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td rowspan="4">
+                    객체지향 프로그래밍<br>
+                    <span class="subject-info">제1실습관207호(컴퓨터실습실)/862<br>강경수</span>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th>6교시 [14:00~14:50]</th>
+                <td></td>
+                <td></td>
+                <td rowspan="3">
+                    웹프로그래밍<br>
+                    <span class="subject-info">바울관 303호(AIC프로젝트LAB실)/857<br>최민석</span>
+                </td>
+                <td rowspan="3">
+                    경제학원론<br>
+                    <span class="subject-info">바울관 312호강의실/858<br>신용재</span>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th>7교시 [15:00~15:50]</th>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th>8교시 [16:00~16:50]</th>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th>9교시 [17:00~17:50]</th>
+                <td></td>
+                <td></td>
+                <td>
+                    인생설계와 진로<br>
+                    <span class="subject-info">바울관 313호 강의실/815<br>최민석</span>
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th>10교시 [18:00~18:50]</th>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td rowspan="3">
+                    SW중심의 미래사회<br>
+                    <span class="subject-info">온라인(가상공간)/1489<br>이동화</span>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th>11교시 [19:00~19:50]</th>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <th>12교시 [20:00~20:50]</th>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
