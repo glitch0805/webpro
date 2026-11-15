@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나만의 공학 & 히스토리 계산기</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700&family=Pretendard:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background-color: #12131a;
+            color: #ffffff;
+            font-family: "Pretendard", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .wrapper {
+            display: flex;
+            gap: 20px;
+            background: #1e202b;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            border: 1px solid #2e3244;
+        }
+        #calc { width: 260px; }
+        h2 { margin: 0 0 15px 0; font-size: 16pt; text-align: center; color: #00e5ff; letter-spacing: 1px; }
+        .screen {
+            background: #0d0e14;
+            padding: 10px 14px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #2a2d3d;
+        }
+        .disp {
+            width: 100%;
+            background: transparent;
+            border: none;
+            text-align: right;
+            font-family: "Oxanium", sans-serif;
+            outline: none;
+        }
+        #disp1 { height: 24px; font-size: 12pt; color: #7c829c; }
+        #disp2 { height: 42px; font-size: 24pt; color: #ffffff; font-weight: 600; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        input[type=button] {
+            height: 54px;
+            border: none;
+            border-radius: 12px;
+            font-family: "Oxanium", sans-serif;
+            font-size: 15pt;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            background: #2a2d3d;
+            color: #e2e4f0;
+        }
+        input[type=button]:hover { transform: translateY(-2px); background: #363a4f; }
+        input[type=button]:active { transform: translateY(0); }
+        .op { background: #312e59 !important; color: #a599ff !important; }
+        .op:hover { background: #413d75 !important; }
+        .eq { background: #00e5ff !important; color: #0d0e14 !important; font-weight: 700; }
+        .eq:hover { background: #33ebff !important; }
+        .func { background: #4a2531 !important; color: #ff6b8b !important; }
+        .func:hover { background: #633141 !important; }
+
+        /* 히스토리 영역 */
+        .history-panel {
+            width: 210px;
+            background: #161821;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #262938;
+        }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #2a2d3d;
+            font-size: 11pt;
+            color: #9ba1b8;
+        }
+        #clear-hist {
+            background: none;
+            border: none;
+            color: #ff6b8b;
+            cursor: pointer;
+            font-size: 9pt;
+        }
+        #history-list {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 310px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #history-list li {
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            background: #1e202b;
+            font-family: "Oxanium", sans-serif;
+            font-size: 10.5pt;
+            text-align: right;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        #history-list li:hover { background: #2a2d3d; }
+        .hist-expr { color: #7c829c; font-size: 9pt; display: block; }
+        .hist-res { color: #00e5ff; font-weight: 600; font-size: 12pt; }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script>
+        function calculateExpression(expr) {
+            let tokens = expr.match(/(\d+\.?\d*|\+|\-|\*|\/|\%)/g);
+            if (!tokens) return "";
+
+            // 1단계: *, /, % 우선 처리
+            for (let i = 0; i < tokens.length; i++) {
+                if (tokens[i] === "*" || tokens[i] === "/" || tokens[i] === "%") {
+                    let prev = parseFloat(tokens[i - 1]);
+                    let next = parseFloat(tokens[i + 1]);
+                    if ((tokens[i] === "/" || tokens[i] === "%") && next === 0) return "Error";
+                    let res = 0;
+                    if (tokens[i] === "*") res = prev * next;
+                    else if (tokens[i] === "/") res = prev / next;
+                    else if (tokens[i] === "%") res = prev % next;
+                    tokens.splice(i - 1, 3, res);
+                    i--;
+                }
+            }
+
+            // 2단계: +, - 순차 처리
+            let result = parseFloat(tokens[0]);
+            for (let i = 1; i < tokens.length; i += 2) {
+                let op = tokens[i];
+                let next = parseFloat(tokens[i + 1]);
+                if (op === "+") result += next;
+                else if (op === "-") result -= next;
+            }
+            // 부동소수점 오차 보정
+            return Number.isFinite(result) ? Math.round(result * 1e10) / 1e10 : "Error";
+        }
+
+        $(document).ready(function(){
+            function appendValue(val) {
+                let cur = $("#disp2").val();
+                if (cur === "Error") cur = "";
+                $("#disp2").val(cur + val);
+            }
+
+            // 숫자 및 소수점 클릭
+            $(".num").click(function(){
+                let val = $(this).val();
+                let cur = $("#disp2").val();
+                // 현재 입력 중인 숫자에 이미 소수점이 있으면 중복 방지
+                if (val === ".") {
+                    let parts = cur.split(/[\+\-\*\/\%]/);
+                    let lastNum = parts[parts.length - 1];
+                    if (lastNum.includes(".")) return;
+                    if (lastNum === "") val = "0.";
+                }
+                appendValue(val);
+            });
+
+            // 연산자 클릭
+            $(".op").click(function(){
+                let cur = $("#disp2").val();
+                let op = $(this).val();
+                if (cur === "" || cur === "Error") return;
+                if (/[\+\-\*\/\%]$/.test(cur)) {
+                    // 마지막 글자가 연산자면 새 연산자로 교체
+                    $("#disp2").val(cur.slice(0, -1) + op);
+                } else {
+                    $("#disp2").val(cur + op);
+                }
+            });
+
+            // '=' 계산 실행
+            $(".eq").click(function(){
+                let cur = $("#disp2").val();
+                if (cur === "" || /[\+\-\*\/\%]$/.test(cur)) return;
+                let result = calculateExpression(cur);
+                $("#disp1").val(cur + " =");
+                $("#disp2").val(result);
+
+                if (result !== "Error") {
+                    let item = `<li data-val="${result}"><span class="hist-expr">${cur} =</span><span class="hist-res">${result}</span></li>`;
+                    $("#history-list").prepend(item);
+                }
+            });
+
+            // 기능 버튼 (AC, 백스페이스, 부호 변환)
+            $(".func").click(function(){
+                let act = $(this).val();
+                let cur = $("#disp2").val();
+                if (act === "AC") {
+                    $("#disp1").val("");
+                    $("#disp2").val("");
+                } else if (act === "⌫") {
+                    $("#disp2").val(cur.slice(0, -1));
+                }
+            });
+
+            // 히스토리 항목 클릭 시 결과값 재사용
+            $(document).on("click", "#history-list li", function(){
+                let val = $(this).attr("data-val");
+                $("#disp2").val($("#disp2").val() + val);
+            });
+
+            // 히스토리 전체 삭제
+            $("#clear-hist").click(function(){
+                $("#history-list").empty();
+            });
+
+            // 키보드 입력 지원
+            $(document).keydown(function(e){
+                let key = e.key;
+                if (/^[0-9\.]$/.test(key)) $(`.num[value="${key}"]`).click();
+                else if (/^[\+\-\*\/\%]$/.test(key)) $(`.op[value="${key}"]`).click();
+                else if (key === "Enter" || key === "=") { e.preventDefault(); $(".eq").click(); }
+                else if (key === "Backspace") $(`.func[value="⌫"]`).click();
+                else if (key === "Escape") $(`.func[value="AC"]`).click();
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="wrapper">
+        <div id="calc">
+            <h2>CALC PRO</h2>
+            <div class="screen">
+                <input type="text" class="disp" id="disp1" readonly>
+                <input type="text" class="disp" id="disp2" readonly placeholder="0">
+            </div>
+            <div class="grid">
+                <input type="button" class="func" value="AC">
+                <input type="button" class="func" value="⌫">
+                <input type="button" class="op" value="%">
+                <input type="button" class="op" value="/">
+
+                <input type="button" class="num" value="7">
+                <input type="button" class="num" value="8">
+                <input type="button" class="num" value="9">
+                <input type="button" class="op" value="*">
+
+                <input type="button" class="num" value="4">
+                <input type="button" class="num" value="5">
+                <input type="button" class="num" value="6">
+                <input type="button" class="op" value="-">
+
+                <input type="button" class="num" value="1">
+                <input type="button" class="num" value="2">
+                <input type="button" class="num" value="3">
+                <input type="button" class="op" value="+">
+
+                <input type="button" class="num" value="0" style="grid-column: span 2;">
+                <input type="button" class="num" value=".">
+                <input type="button" class="eq" value="=">
+            </div>
+        </div>
+
+        <div class="history-panel">
+            <div class="history-header">
+                <span>계산 기록</span>
+                <button id="clear-hist">비우기</button>
+            </div>
+            <ul id="history-list"></ul>
+        </div>
+    </div>
+</body>
+</html>
